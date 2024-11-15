@@ -41,13 +41,6 @@ var html_start_record = `
       let recorder;
       let isRecording = false;
 
-	  const getUserMedia =
-      navigator.mediaDevices.getUserMedia ||
-      navigator.webkitGetUserMedia ||
-      navigator.mozGetUserMedia;
-	  console.log('getUserMedia', getUserMedia);
-
-
       navigator.mediaDevices
           .getUserMedia({ video: true, audio: true })
           .then(function (stream) {
