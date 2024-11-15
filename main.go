@@ -1,6 +1,11 @@
 package main
 
-import webview "github.com/webview/webview_go"
+import (
+	"fmt"
+	"net/http"
+
+	webview "github.com/webview/webview_go"
+)
 
 var html_start_record = `
 <!DOCTYPE html>
@@ -36,6 +41,13 @@ var html_start_record = `
       let recorder;
       let isRecording = false;
 
+	  const getUserMedia =
+      navigator.mediaDevices.getUserMedia ||
+      navigator.webkitGetUserMedia ||
+      navigator.mozGetUserMedia;
+	  console.log('getUserMedia', getUserMedia);
+
+
       navigator.mediaDevices
           .getUserMedia({ video: true, audio: true })
           .then(function (stream) {
@@ -43,7 +55,7 @@ var html_start_record = `
               video.muted = true; // Mute the video element to avoid feedback noise.
               recorder = new MediaRecorder(stream);
 
-              recorder.ondataavailable   
+              recorder.ondataavailable 
 = (event) => {
                   // Handle recorded data (e.g., save to file or send to server)
                   console.log(event.data);
@@ -103,11 +115,22 @@ var html_start_record = `
 `
 
 func main() {
+
+	// create a localhost server
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, html_start_record)
+	})
+	go http.ListenAndServe(":8080", nil)
+
+	// create a webview
 	debug := true
 	w := webview.New(debug)
 	defer w.Destroy()
 	w.SetTitle("Basic Webview")
 	w.SetSize(600, 400, webview.HintNone)
-	w.SetHtml(html_start_record)
+	// w.SetHtml(html_start_record)
+	w.Navigate("http://localhost:8080")
 	w.Run()
 }
+
+// we have to serve the page over https
