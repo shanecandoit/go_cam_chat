@@ -4,7 +4,7 @@
     <title>Webcam Recorder</title>
     <style>
       #recordButton {
-        background-color: red;
+        background-color: green;
         border: none;
         color: white;
         padding: 15px 32px;
@@ -38,7 +38,7 @@
               video.muted = true; // Mute the video element to avoid feedback noise.
               recorder = new MediaRecorder(stream);
 
-              recorder.ondataavailable   
+              recorder.ondataavailable 
 = (event) => {
                   // Handle recorded data (e.g., save to file or send to server)
                   console.log(event.data);
@@ -84,10 +84,12 @@
           if (!isRecording) {
               recorder.start();
               recordButton.textContent = "Stop Recording";
+              recordButton.style.backgroundColor = 'red';
               isRecording = true;
           } else {
               recorder.stop();
               recordButton.textContent = "Start Recording";
+              recordButton.style.backgroundColor = 'green';
               isRecording = false;
           }
       });
