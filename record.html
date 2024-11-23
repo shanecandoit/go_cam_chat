@@ -3,6 +3,12 @@
   <head>
     <title>Webcam Recorder</title>
     <style>
+      html, body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+      }
       #recordButton {
         background-color: green;
         border: none;
@@ -38,8 +44,7 @@
               video.muted = true; // Mute the video element to avoid feedback noise.
               recorder = new MediaRecorder(stream);
 
-              recorder.ondataavailable 
-= (event) => {
+              recorder.ondataavailable = (event) => {
                   // Handle recorded data (e.g., save to file or send to server)
                   console.log(event.data);
 
@@ -57,19 +62,24 @@
                   a.href = url;
                   a.download = random_string;
                   // a.click();
-                  // URL.revokeObjectURL(url); // free up storage--no longer needed.
-
-                  // save the video to disk
+                  
+                  // save a link to the video file to download it
+                  const ptag = document.createElement('p');
                   const link = document.createElement('a');
+                  ptag.appendChild(link);
                   link.href = url;
                   link.setAttribute('download', random_string);
                   link.setAttribute('target', '_blank'); // open in new tab
                   link.innerText = 'Download - ' + random_string; // or display the name of the file
-                  document.body.appendChild(link);
+                  document.body.appendChild(ptag);
                   link.click();
                   // document.body.removeChild(link);
-                  document.appendChild(document.createElement('br'));
-
+                  
+                  // Upload the video to server
+                  uploadVideo(blob, random_string);
+                  
+                  // free up storage--no longer needed.
+                  URL.revokeObjectURL(url); 
               };
 
               recorder.onerror = (error) => {
@@ -93,6 +103,19 @@
               isRecording = false;
           }
       });
+
+      function uploadVideo(blob, filename) {
+        const formData = new FormData();
+        formData.append('video', blob, filename);
+        fetch('/', {
+          method: 'POST',
+          body: formData
+        }).then(response => {
+          console.log('Server response:', response);
+        }).catch(error => {
+          console.error('Error uploading video:', error);
+        });
+      }
   </script>
   </body>
 </html>
